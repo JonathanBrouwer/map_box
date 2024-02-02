@@ -16,7 +16,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        toolchain: nightly
+        components: miri, clippy, fmt
+        override: true
     - name: Build
       run: cargo build --verbose
     - name: Run tests
       run: cargo miri test --verbose
+    - name: Clippy
+      run: cargo clippy
+    - name: Fmt
+      run: cargo fmt --check
