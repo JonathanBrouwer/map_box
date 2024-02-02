@@ -15,10 +15,17 @@ let b = Box::new(42u64);
 let b = b.map(|v| v as i64);
 ```
 
+The signature of `map` is:
+```rust
+impl<T1> Box<T1> {
+    fn map<T2>(self, f: impl FnMut(T1) -> T2) -> Box<T2>;
+}
+```
+
 
 ## Limitations
 
-If the alignment of the type changes, even if the alignment becomes lower, the Box needs to be reallocated.
+If the alignment requirements of the type changes, even if the alignment becomes lower, the Box needs to be reallocated.
 This is because:
 1. [alloc::dealloc](https://doc.rust-lang.org/stable/std/alloc/trait.GlobalAlloc.html#tymethod.dealloc) requires the layout to be identical to the layout that the allocation was made with
 2. [alloc::realloc](https://doc.rust-lang.org/stable/std/alloc/trait.GlobalAlloc.html#method.realloc) only takes a new size, it cannot change the layout of the allocation downwards

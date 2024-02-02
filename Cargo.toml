@@ -2,7 +2,9 @@
 name = "map_box"
 version = "0.1.0"
 edition = "2021"
+authors = ["Jonathan Brouwer <jonathantbrouwer@gmail.com>"]
+description = "Map the value in a Box, re-using the allocation when possible."
+keywords = ["map", "box"]
+license = "MIT"
+repository = "https://github.com/JonathanBrouwer/map_box"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
