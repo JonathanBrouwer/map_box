@@ -1,6 +1,6 @@
 use std::alloc::{handle_alloc_error, Layout};
 use std::mem::MaybeUninit;
-use std::{alloc, mem, ptr};
+use std::{alloc, ptr};
 
 pub trait Map<T1> {
     type Target<T2>;
