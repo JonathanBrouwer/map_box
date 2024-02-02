@@ -1,6 +1,6 @@
 use std::alloc::{handle_alloc_error, Layout};
 use std::mem::MaybeUninit;
-use std::{alloc, ptr};
+use std::{alloc, mem, ptr};
 
 pub trait Map<T1> {
     type Target<T2>;
@@ -38,7 +38,7 @@ impl<T1> Map<T1> for Box<T1> {
         let tmp_box: Box<MaybeUninit<T1>> =
             unsafe { Box::from_raw(from_ptr as *mut MaybeUninit<T1>) };
         let v = f(v);
-        Box::into_raw(tmp_box);
+        mem::forget(tmp_box);
 
         // Generate a `to_ptr` from `from_ptr` that can fit a `T2`
         let to_ptr = if to_layout.size() != from_layout.size() {
