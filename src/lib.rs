@@ -119,4 +119,52 @@ mod tests {
         let b = Box::new(42u64);
         b.map_box(|_| panic!());
     }
+
+    #[test]
+    fn align_up_high() {
+        #[repr(align(16))]
+        struct Test1(u64);
+        #[repr(align(128))]
+        struct Test2(u64);
+
+        let b = Box::new(Test1(42));
+        let b = b.map_box(|Test1(v)| Test2(v));
+        assert_eq!(b.0, 42);
+    }
+
+    #[test]
+    fn align_down_high() {
+        #[repr(align(128))]
+        struct Test1(u64);
+        #[repr(align(16))]
+        struct Test2(u64);
+
+        let b = Box::new(Test1(42));
+        let b = b.map_box(|Test1(v)| Test2(v));
+        assert_eq!(b.0, 42);
+    }
+
+    #[test]
+    fn align_up_low() {
+        #[repr(align(1))]
+        struct Test1(u64);
+        #[repr(align(8))]
+        struct Test2(u64);
+
+        let b = Box::new(Test1(42));
+        let b = b.map_box(|Test1(v)| Test2(v));
+        assert_eq!(b.0, 42);
+    }
+
+    #[test]
+    fn align_down_low() {
+        #[repr(align(8))]
+        struct Test1(u64);
+        #[repr(align(1))]
+        struct Test2(u64);
+
+        let b = Box::new(Test1(42));
+        let b = b.map_box(|Test1(v)| Test2(v));
+        assert_eq!(b.0, 42);
+    }
 }
