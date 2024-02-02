@@ -19,7 +19,7 @@ jobs:
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: nightly
-        components: miri, clippy
+        components: miri, clippy, rustfmt
         override: true
     - name: Build
       run: cargo build --verbose
