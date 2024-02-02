@@ -49,6 +49,11 @@ impl<T1> Map<T1> for Box<T1> {
             };
             // Realloc will return null in case of an alloc error, we need to check for this
             if to_ptr.is_null() {
+                // We still need to dealloc the old box
+                // Safety: from_ptr is still valid if `realloc` returns null
+                unsafe {
+                    alloc::dealloc(from_ptr as *mut u8, from_layout);
+                }
                 handle_alloc_error(to_layout)
             }
             to_ptr
