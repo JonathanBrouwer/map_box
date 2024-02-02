@@ -12,13 +12,13 @@ For example, this code will not re-allocate.
 use map_box::Map;
 
 let b = Box::new(42u64);
-let b = b.map(|v| v as i64);
+let b = b.map_box(|v| v as i64);
 ```
 
 The signature of `map` is:
 ```rust
 impl<T1> Box<T1> {
-    fn map<T2>(self, f: impl FnMut(T1) -> T2) -> Box<T2>;
+    fn map_box<T2>(self, f: impl FnMut(T1) -> T2) -> Box<T2>;
 }
 ```
 

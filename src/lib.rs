@@ -7,7 +7,7 @@ pub trait Map<T1> {
 
     /// Returns a box, with function f applied to the value inside.
     /// This function will re-use the allocation when possible.
-    fn map<T2>(self, f: impl FnMut(T1) -> T2) -> Self::Target<T2>;
+    fn map_box<T2>(self, f: impl FnMut(T1) -> T2) -> Self::Target<T2>;
 }
 
 impl<T1> Map<T1> for Box<T1> {
@@ -15,7 +15,7 @@ impl<T1> Map<T1> for Box<T1> {
 
     /// Returns a box, with function f applied to the value inside.
     /// This function will re-use the allocation when possible.
-    fn map<T2>(self, mut f: impl FnMut(T1) -> T2) -> Self::Target<T2> {
+    fn map_box<T2>(self, mut f: impl FnMut(T1) -> T2) -> Self::Target<T2> {
         // Get layouts of the types
         let from_layout = Layout::new::<T1>();
         let to_layout = Layout::new::<T2>();
@@ -67,49 +67,56 @@ mod tests {
     #[test]
     fn same_type() {
         let b = Box::new(21u64);
-        let b = b.map(|v| v * 2);
+        let b = b.map_box(|v| v * 2);
         assert_eq!(*b, 42);
     }
 
     #[test]
     fn same_size() {
         let b = Box::new(42u64);
-        let b = b.map(|v| v as i64);
+        let b = b.map_box(|v| v as i64);
         assert_eq!(*b, 42);
     }
 
     #[test]
     fn down_size() {
         let b = Box::new(42u64);
-        let b = b.map(|v| v as u32);
+        let b = b.map_box(|v| v as u32);
         assert_eq!(*b, 42);
     }
 
     #[test]
     fn up_size() {
         let b = Box::new(42u32);
-        let b = b.map(|v| v as u64);
+        let b = b.map_box(|v| v as u64);
         assert_eq!(*b, 42);
     }
 
     #[test]
     fn zst_in() {
         let b = Box::new(());
-        let b = b.map(|_| 42u64);
+        let b = b.map_box(|_| 42u64);
         assert_eq!(*b, 42);
     }
 
     #[test]
     fn zst_out() {
         let b = Box::new(42u64);
-        let b = b.map(|_| ());
+        let b = b.map_box(|_| ());
         assert_eq!(*b, ());
     }
 
     #[test]
     fn zst_both() {
         let b = Box::new(());
-        let b: Box<[u64; 0]> = b.map(|_| []);
+        let b: Box<[u64; 0]> = b.map_box(|_| []);
         assert_eq!(*b, []);
+    }
+
+    #[test]
+    #[should_panic]
+    fn panic() {
+        let b = Box::new(42u64);
+        b.map_box(|_| panic!());
     }
 }
