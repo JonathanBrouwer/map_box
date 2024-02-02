@@ -2,7 +2,7 @@ use std::alloc::Layout;
 use std::mem::MaybeUninit;
 use std::{alloc, ptr};
 
-trait Map<T1> {
+pub trait Map<T1> {
     type Target<T2>;
     fn map<T2>(self, f: impl FnMut(T1) -> T2) -> Self::Target<T2>;
 }
