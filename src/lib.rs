@@ -1,6 +1,6 @@
 use std::alloc::Layout;
-use std::{alloc, ptr};
 use std::mem::MaybeUninit;
+use std::{alloc, ptr};
 
 trait Map<T1> {
     type Target<T2>;
@@ -18,8 +18,11 @@ impl<T1> Map<T1> for Box<T1> {
         // If `T1` or `T2` is a ZST, we let `Box` handle the logic for us. This is optimal.
         // If the alignment requirements of T1 and T2 are different, we also call this.
         // This is because `dealloc` requires the alignment to be identical, and there's no way to realloc with a different Layout
-        if from_layout.size() == 0 || to_layout.size() == 0 || from_layout.align() != to_layout.align() {
-            return Box::new(f(*self))
+        if from_layout.size() == 0
+            || to_layout.size() == 0
+            || from_layout.align() != to_layout.align()
+        {
+            return Box::new(f(*self));
         }
 
         // Safety: Read T1, safe since `from_ptr` was created from a Box<T1>
@@ -27,7 +30,8 @@ impl<T1> Map<T1> for Box<T1> {
         let v = unsafe { ptr::read(from_ptr) };
 
         // Apply `f`. Create a temporary Box so the allocation of the Box is deallocated on panic of `f`
-        let tmp_box: Box<MaybeUninit<T1>> = unsafe { Box::from_raw(from_ptr as *mut MaybeUninit<T1>) };
+        let tmp_box: Box<MaybeUninit<T1>> =
+            unsafe { Box::from_raw(from_ptr as *mut MaybeUninit<T1>) };
         let v = f(v);
         Box::into_raw(tmp_box);
 
