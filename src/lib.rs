@@ -4,12 +4,17 @@ use std::{alloc, ptr};
 
 pub trait Map<T1> {
     type Target<T2>;
+
+    /// Returns a box, with function f applied to the value inside.
+    /// This function will re-use the allocation when possible.
     fn map<T2>(self, f: impl FnMut(T1) -> T2) -> Self::Target<T2>;
 }
 
 impl<T1> Map<T1> for Box<T1> {
     type Target<T2> = Box<T2>;
 
+    /// Returns a box, with function f applied to the value inside.
+    /// This function will re-use the allocation when possible.
     fn map<T2>(self, mut f: impl FnMut(T1) -> T2) -> Self::Target<T2> {
         // Get layouts of the types
         let from_layout = Layout::new::<T1>();
