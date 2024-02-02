@@ -1,4 +1,4 @@
-use std::alloc::Layout;
+use std::alloc::{handle_alloc_error, Layout};
 use std::mem::MaybeUninit;
 use std::{alloc, ptr};
 
@@ -43,10 +43,15 @@ impl<T1> Map<T1> for Box<T1> {
         // Generate a `to_ptr` from `from_ptr` that can fit a `T2`
         let to_ptr = if to_layout.size() != from_layout.size() {
             // We need to re-allocate, because the size of the Box is incorrect
-            unsafe {
+            let to_ptr = unsafe {
                 // Safety: from_layout was used to allocate the Box and to_layout is non-zero
                 alloc::realloc(from_ptr as *mut u8, from_layout, to_layout.size()) as *mut T2
+            };
+            // Realloc will return null in case of an alloc error, we need to check for this
+            if to_ptr.is_null() {
+                handle_alloc_error(to_layout)
             }
+            to_ptr
         } else {
             // Size and alignment are correct, so we can re-use the allocation
             from_ptr as *mut T2
