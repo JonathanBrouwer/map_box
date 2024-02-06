@@ -54,7 +54,7 @@ impl<T1> Map<T1> for Box<T1> {
                 unsafe {
                     alloc::dealloc(from_ptr as *mut u8, from_layout);
                 }
-                handle_alloc_error(to_layout)
+                handle_alloc_error(to_layout);
             }
             to_ptr
         } else {
